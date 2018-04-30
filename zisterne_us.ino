@@ -40,7 +40,7 @@ void loop() {
     // Berechnung
     letzteDauer = 0.95 * letzteDauer + 0.05 * dauer;
 
-  if(loopCount++ % 10 == 0)
+  if(loopCount++ % 100 == 0)
   {
     // Berechne Mikrosekunden in cm
     cm = ((letzteDauer)/2)/29;
