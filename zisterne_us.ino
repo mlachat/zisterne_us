@@ -10,7 +10,6 @@ const int echoPin = 8;
 const int cm_min = 20;
 const int cm_max = 151;
 const int liter_max = 4500;
-const int durchgaenge = 3;
 int liter, balken;
 float cm, dauer, letzteDauer;
 int loopCount = 0;

@@ -5,6 +5,10 @@ Ziel ist es mit einem Arduino Nano und dem Ultraschall Sensor HC-SR04 den Fülls
 
 Zu Beginn wurde ein 16 x 2 Display angeschlossen. Ziel ist die Messung an ein Loxone Mini Server zu melden und in der Loxone App den Füllstand zu visualisieren.
 
+## Fritzing
+
+<img src="./UltraSchallSensorWiring_bb.svg">
+
 ### Prerequisites
 
 Hardware:
