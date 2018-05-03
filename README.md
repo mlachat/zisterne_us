@@ -7,7 +7,7 @@ Zu Beginn wurde ein 16 x 2 Display angeschlossen. Ziel ist die Messung an ein Lo
 
 ## Fritzing
 
-<img src="./UltraSchallSensorWiring_bb.svg">
+<img src="./UltraSchallSensorWiring_bb.png">
 
 ### Prerequisites
 
