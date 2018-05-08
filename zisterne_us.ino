@@ -36,7 +36,7 @@ int loopCount, liter, balken;
 float cm, dauer, letzteDauer;
 
 char cm_als_string[10];
-const float laufzeit_schall_x2 = 29.1*2;
+const float laufzeit_schall_x2 = 29.1 * 2;
 bool debug = true;
 
 
@@ -49,68 +49,68 @@ void setup() {
 
   // Netzwerk Setup
   netzwerkInit();
-  
+
   // LCD
   displayInit();
 }
 
 void loop() {
-    digitalWrite(triggerPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(triggerPin, LOW);
+  digitalWrite(triggerPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(triggerPin, LOW);
 
-    // Erfassung - Dauer in Mikrosekunden
-    dauer = pulseIn(echoPin, HIGH);
+  // Erfassung - Dauer in Mikrosekunden
+  dauer = pulseIn(echoPin, HIGH);
 
-    // Berechnung
-    letzteDauer = 0.95 * letzteDauer + 0.05 * dauer;
+  // Berechnung
+  letzteDauer = 0.95 * letzteDauer + 0.05 * dauer;
 
-    if(loopCount++ % 100 == 0) {
-      // Berechne Laufzeit in Mikrosekunden zu Wegstrecke in cm
-      cm = letzteDauer/laufzeit_schall_x2;
-    
-      // Berechne Liter
-      liter = CmZuLiter(cm);
-     
-      // Berechne Balken
-      balken = round((16.0*liter)/liter_max);
-  
-      if (debug) {
-        Serial.print(cm);
-        Serial.print(" cm\n");
-      }
-  
-      // an Loxone senden 
-      dtostrf(cm, 4, 0, cm_als_string); //Distanz fuer UDP Versand umwandeln
-      sendUDP(cm_als_string); //Ergebnis an MiniServer senden
-    
-      // LCD-Ausgabe
-      lcd.clear();
-      
-      // Zeile 1
-      lcd.setCursor(4,0);
-      lcd.print(liter);
-      lcd.print(" Liter");
-    
-      // Zeile 2
-      for (int i=0; i<balken; i++) {
-        lcd.setCursor(i,1);
-        lcd.write((unsigned char)1023);
-      }
+  if (loopCount++ % 100 == 0) {
+    // Berechne Laufzeit in Mikrosekunden zu Wegstrecke in cm
+    cm = letzteDauer / laufzeit_schall_x2;
+
+    // Berechne Liter
+    liter = CmZuLiter(cm);
+
+    // Berechne Balken
+    balken = round((16.0 * liter) / liter_max);
+
+    if (debug) {
+      Serial.print(cm);
+      Serial.print(" cm\n");
     }
-    delay(100);
+
+    // an Loxone senden
+    dtostrf(cm, 4, 0, cm_als_string); //Distanz fuer UDP Versand umwandeln
+    sendUDP(cm_als_string); //Ergebnis an MiniServer senden
+
+    // LCD-Ausgabe
+    lcd.clear();
+
+    // Zeile 1
+    lcd.setCursor(4, 0);
+    lcd.print(liter);
+    lcd.print(" Liter");
+
+    // Zeile 2
+    for (int i = 0; i < balken; i++) {
+      lcd.setCursor(i, 1);
+      lcd.write((unsigned char)1023);
+    }
+  }
+  delay(100);
 }
 
 int CmZuLiter(float x) {
   if (x < cm_min ) {
-      x = cm_min ;
+    x = cm_min ;
   }
   if (x > cm_max) {
     x = cm_max ;
   }
 
   // 20 CM = 100%, 130cm = 0%
-  return (1-((x - cm_min) / (cm_max - cm_min))) * liter_max;
+  return (1 - ((x - cm_min) / (cm_max - cm_min))) * liter_max;
 }
 
 //UDP-Befehl senden
@@ -123,11 +123,11 @@ void sendUDP(String text) {
 
 void displayInit() {
   lcd.begin();
-  lcd.setCursor(3,0);
+  lcd.setCursor(3, 0);
   lcd.print("Willkommen");
 }
 
-void netzwerkInit(){
+void netzwerkInit() {
   if (!Ethernet.begin(mac)) Serial.println("DHCP Fehler");
   else {
     Serial.println ("Netzwerkeinstellungen");
@@ -155,7 +155,7 @@ void netzwerkInit(){
     Serial.println(MSPORT);
     Serial.println ("---------------");
   }
-  
+
   Udp.begin(ARDUPORT);
 
 }
