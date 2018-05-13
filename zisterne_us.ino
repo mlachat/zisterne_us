@@ -1,29 +1,23 @@
-#include <EthernetClient.h>
-#include <Ethernet.h>
-#include <Dhcp.h>
-#include <EthernetServer.h>
-#include <Dns.h>
-#include <EthernetUdp.h>
-#include <Wire.h>
+#include <UIPEthernet.h>
 #include <LiquidCrystal_I2C.h>
 
 // PINs
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-const int triggerPin = 7;
-const int echoPin = 8;
+const int triggerPin = 5;
+const int echoPin = 4;
 
 // Hier die eigene MAC-Adresse eintragen
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEB };
+byte mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0x78, 0xEE  };  
+// Change the IP below to your subnet if you have any issues
+//    IPAddress ip(192, 168, 0, 115);                                
+IPAddress ip(192, 168, 188, 213);
 // UDP Port zum Datenempfang Lox MS -> Arduino
 unsigned int ARDUPORT = 7013;
 
 // IP Loxone Miniserver
-IPAddress MSIP(192, 168, 178, 100);
+IPAddress MSIP(192, 168, 188, 121);
 // UDP Port zum Datenversand Arduino -> Lox MS
 unsigned int MSPORT = 7014;
-
-// Daten-Puffer initalisieren
-char packetBuffer[UDP_TX_PACKET_MAX_SIZE];
 
 // UDP Instanz erzeugen
 EthernetUDP Udp;
@@ -41,17 +35,28 @@ bool debug = true;
 
 
 void setup() {
+
   Serial.begin(9600);
+
+  uint8_t mac[6] = {0x00,0x01,0x02,0x03,0x04,0x05};
+
+  Ethernet.begin(mac,IPAddress(192,168,188,6));
+
+  int success = Udp.begin(5000);
+
+  Serial.print("initialize: ");
+  Serial.println(success ? "success" : "failed");
+   // netzwerkInit();
   // PIN-Modes
   pinMode(triggerPin, OUTPUT);
   digitalWrite(triggerPin, LOW);
   pinMode(echoPin, INPUT);
+  Serial.println(Ethernet.localIP());
 
   // Netzwerk Setup
-  netzwerkInit();
 
   // LCD
-  displayInit();
+  //displayInit();
 }
 
 void loop() {
@@ -65,7 +70,7 @@ void loop() {
   // Berechnung
   letzteDauer = 0.95 * letzteDauer + 0.05 * dauer;
 
-  if (loopCount++ % 100 == 0) {
+  if (loopCount++ % 10 == 0) {
     // Berechne Laufzeit in Mikrosekunden zu Wegstrecke in cm
     cm = letzteDauer / laufzeit_schall_x2;
 
@@ -84,7 +89,7 @@ void loop() {
     dtostrf(cm, 4, 0, cm_als_string); //Distanz fuer UDP Versand umwandeln
     sendUDP(cm_als_string); //Ergebnis an MiniServer senden
 
-    // LCD-Ausgabe
+    /* LCD-Ausgabe
     lcd.clear();
 
     // Zeile 1
@@ -96,7 +101,7 @@ void loop() {
     for (int i = 0; i < balken; i++) {
       lcd.setCursor(i, 1);
       lcd.write((unsigned char)1023);
-    }
+    }*/
   }
   delay(100);
 }
@@ -115,9 +120,12 @@ int CmZuLiter(float x) {
 
 //UDP-Befehl senden
 void sendUDP(String text) {
+    Serial.println("trying to sendnetwork");
   Udp.beginPacket(MSIP, MSPORT);
   Udp.print(text);
+      Serial.println("DONE SENDING");
   Udp.endPacket();
+      Serial.println("PACKET ENDED");
   delay(10);
 }
 
@@ -128,8 +136,10 @@ void displayInit() {
 }
 
 void netzwerkInit() {
-  if (!Ethernet.begin(mac)) Serial.println("DHCP Fehler");
-  else {
+  Serial.println("Setup network");
+  Ethernet.begin(mac, ip); 
+ // if (!Ethernet.begin(mac)) Serial.println("DHCP Fehler");
+ // else {
     Serial.println ("Netzwerkeinstellungen");
     Serial.println ("---------------");
     Serial.print("Arduino MAC Adresse: ");
@@ -154,8 +164,8 @@ void netzwerkInit() {
     Serial.print("Miniserver UDP Port: ");
     Serial.println(MSPORT);
     Serial.println ("---------------");
-  }
-
+  //}
+  Serial.println(" network Done");
   Udp.begin(ARDUPORT);
 
 }
