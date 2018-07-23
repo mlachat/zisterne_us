@@ -26,7 +26,7 @@ EthernetUDP Udp;
 const int cm_min = 20;
 const int cm_max = 110;
 const int liter_max = 4180;
-int loopCount, liter, balken;
+int loopCount, liter;
 float cm, dauer, letzteDauer;
 
 char cm_als_string[10];
@@ -46,17 +46,12 @@ void setup() {
 
   Serial.print("initialize: ");
   Serial.println(success ? "success" : "failed");
-   // netzwerkInit();
+  // netzwerkInit();
   // PIN-Modes
   pinMode(triggerPin, OUTPUT);
   digitalWrite(triggerPin, LOW);
   pinMode(echoPin, INPUT);
   Serial.println(Ethernet.localIP());
-
-  // Netzwerk Setup
-
-  // LCD
-  //displayInit();
 }
 
 void loop() {
@@ -77,31 +72,14 @@ void loop() {
     // Berechne Liter
     liter = CmZuLiter(cm);
 
-    // Berechne Balken
-    balken = round((16.0 * liter) / liter_max);
-
-    if (debug) {
-      Serial.print(cm);
-      Serial.print(" cm\n");
-    }
-
-    // an Loxone senden
+     // an Loxone senden
     dtostrf(cm, 4, 0, cm_als_string); //Distanz fuer UDP Versand umwandeln
+    if (debug) {
+      Serial.println(cm_als_string);
+      Serial.println(liter);
+    }
     sendUDP(cm_als_string); //Ergebnis an MiniServer senden
 
-    /* LCD-Ausgabe
-    lcd.clear();
-
-    // Zeile 1
-    lcd.setCursor(4, 0);
-    lcd.print(liter);
-    lcd.print(" Liter");
-
-    // Zeile 2
-    for (int i = 0; i < balken; i++) {
-      lcd.setCursor(i, 1);
-      lcd.write((unsigned char)1023);
-    }*/
   }
   delay(100);
 }
@@ -120,19 +98,13 @@ int CmZuLiter(float x) {
 
 //UDP-Befehl senden
 void sendUDP(String text) {
-    Serial.println("trying to sendnetwork");
-  Udp.beginPacket(MSIP, MSPORT);
-  Udp.print(text);
-      Serial.println("DONE SENDING");
-  Udp.endPacket();
-      Serial.println("PACKET ENDED");
+    Serial.println("trying to send string to loxone");
+    Udp.beginPacket(MSIP, MSPORT);
+    Udp.print(text);
+    Serial.println("DONE SENDING\n");
+    Udp.endPacket();
+    Serial.println("PACKET ENDED\n");
   delay(10);
-}
-
-void displayInit() {
-  lcd.begin();
-  lcd.setCursor(3, 0);
-  lcd.print("Willkommen");
 }
 
 void netzwerkInit() {
