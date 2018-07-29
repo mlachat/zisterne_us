@@ -1,4 +1,4 @@
-#include <Wire.h>
+ #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
 // PINs
@@ -7,9 +7,9 @@ const int triggerPin = 7;
 const int echoPin = 8;
 
 // VARs
-const int cm_min = 30;
-const int cm_max = 120;
-const int liter_max = 4180;
+const int cm_min = 26;
+const int cm_max = 136;
+const int liter_max = 4181;
 int loopCount, liter, balken;
 float cm, dauer, letzteDauer;
 
