@@ -3,13 +3,13 @@
 
 // PINs
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-const int triggerPin = 5;
-const int echoPin = 4;
+const int triggerPin = 7;
+const int echoPin = 8;
 
 // Hier die eigene MAC-Adresse eintragen
 byte mac[] = { 0x90, 0xA2, 0xDA, 0x0D, 0x78, 0xEE  };  
                             
-IPAddress ip(192, 168, 188, 213);
+IPAddress ip(192, 168, 188, 6);
 // UDP Port zum Datenempfang Lox MS -> Arduino
 unsigned int ARDUPORT = 7013;
 
@@ -22,26 +22,28 @@ unsigned int MSPORT = 7014;
 EthernetUDP Udp;
 
 // VARs
-const int cm_min = 30;
-const int cm_max = 120;
-const int liter_max = 4180;
+const int cm_min = 26;
+const int cm_max = 136;
+const int liter_max = 4181;
 int loopCount, liter;
 float cm, dauer, letzteDauer;
 
-char cm_als_string[10];
+char liter_als_string[10];
 const float laufzeit_schall_x2 = 29.1 * 2;
 bool debug = false;
 
 void setup() {
   Serial.begin(9600);
   uint8_t mac[6] = {0x00,0x01,0x02,0x03,0x04,0x05};
-  Ethernet.begin(mac,IPAddress(192,168,188,6));
-  int success = Udp.begin(5000);
+  Ethernet.begin(mac,ip);
+  // int success = Udp.begin(5000);
   // PIN-Modes
   pinMode(triggerPin, OUTPUT);
   digitalWrite(triggerPin, LOW);
   pinMode(echoPin, INPUT);
-  Serial.println(Ethernet.localIP());
+  if (debug) {
+    Serial.println(Ethernet.localIP());
+  }
 }
 
 void loop() {
@@ -55,7 +57,7 @@ void loop() {
   // Berechnung mit filter
   letzteDauer = 0.95 * letzteDauer + 0.05 * dauer;
 
-  if (loopCount++ % 10 == 0) {
+  if (loopCount++ % 20 == 0) {
     // Berechne Laufzeit in Mikrosekunden zu Wegstrecke in cm
     cm = letzteDauer / laufzeit_schall_x2;
 
@@ -63,12 +65,12 @@ void loop() {
     liter = CmZuLiter(cm);
 
      // umformatieren fuer loxone ms
-    dtostrf(cm, 4, 0, cm_als_string); //Distanz fuer UDP Versand umwandeln
+    dtostrf(liter, 4, 0, liter_als_string); //Distanz fuer UDP Versand umwandeln
     if (debug) {
-      Serial.println(cm_als_string);
-      Serial.println(liter);
+      Serial.println(liter_als_string);
+      //Serial.println(liter);
     }
-    sendUDP(cm_als_string);
+    sendUDP(liter_als_string);
 
   }
   delay(100);
@@ -82,8 +84,8 @@ int CmZuLiter(float x) {
 }
 
 void sendUDP(String text) {
-    Serial.print("trying to send this string to loxone: ");
-    Serial.println(text);
+    
+    //Serial.print("trying to send this string to loxone: ");
     Udp.beginPacket(MSIP, MSPORT);
     Udp.print(text);
     Udp.endPacket();
